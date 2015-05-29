@@ -1,4 +1,4 @@
-
+git log--> vrati povijet promjena.
 Jure napisao: 27.5
 Ivan:
 ->kalendar_i_tablica.html:
