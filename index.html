@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html >
+  <head>
+		<meta charset="UTF-8">
+		<title>Rezervacija</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+  <body>
+	 
+  <div class='info'>
+    <h1>Registracija korisnika</h1>
+	</div>
+<div class='form aniamted bounceIn'>
+  <div class='login'>
+    <h2>Prijavite se</h2>
+    <form method = 'post' action = "login.php">
+     	 <input placeholder = 'Korisničko ime' type = 'text', name = "username">
+      	<input placeholder = 'Lozinka' type = "password", name = "password">
+      	<button type="submit">Login</button>
+    	</form>
+    	<button id = "pogledaj" >Pogledaj raspored</button>
+  </div>
+</div>
+<script>
+	var pogledaj = document.getElementById("pogledaj");
+	pogledaj.onclick = function(){
+		window.location.href="http://localhost/~jmilasi/projekt/samo_pregledaj.php";
+	}
+</script>
+ </body>
+</html>
