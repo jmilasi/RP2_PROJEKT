@@ -23,7 +23,6 @@ if( isset( $username ) && isset( $_POST['logout'] ) ) {
 }
 ?>
 
-?>
 
 
 <!DOCTYPE html>
@@ -48,28 +47,28 @@ if( isset( $username ) && isset( $_POST['logout'] ) ) {
 		<?php
 	} 
 	else {
-		// Ako nije ulogiran, ispiši mu formu za logiranje. ?>
+		?>
 	<div class='info'>
     <h1>Registracija korisnika</h1>
 	</div>
 		<div class='form aniamted bounceIn'>
  		 <div class='login'>
- 		   <h2 style="color:red;">Krivo unesena šifra ili lozinka:</h2>
- 		   <form method = 'post' action = "akcija.php">
+ 		   <h2>Prijavite se</h2>
+ 		   <form method = 'post' action = "login.php">
  		     	<input placeholder = 'Korisničko ime' type = 'text', name = "username">
 		      	<input placeholder = 'Lozinka' type = "password", name = "password">
       			<button type="submit">Login</button>
 		    </form>
 		    <button id = "pogledaj" >Pogledaj raspored</button>
- 		 </div>
-		</div>
+  	</div>
+	</div>
 		<?php
 	}
 ?>
 <script>
 	var pogledaj = document.getElementById("pogledaj");
 	pogledaj.onclick = function(){
-		window.location.href="http://localhost/~jmilasi/projekt/index2.html";
+		window.location.href = 'http://localhost/~jmilasi/projekt/samo_pregledaj.html';
 	}
 </script>
 </body>

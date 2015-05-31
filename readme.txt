@@ -10,3 +10,8 @@ Ivan:
 Opcenito:
 	- u funckije.php funckcija dozvola() nije gotova, to ce Jure ili Mario srediti sutra, prekosutra.
 	- za sada pisemo u kalendar_i_tablica.html kod, pa ćemo kasnije spojiti sve skupa.
+
+
+31.05.
+	-nama ne treba ovaj login.html, dovoljan nam je samo login.php
+	- isprava smo stavili samo_pregledaj.php, no prebacit ćemo to na .html

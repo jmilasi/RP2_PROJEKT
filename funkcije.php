@@ -34,15 +34,18 @@ function addUserToDatabase()
 
 	// Dozvoli samo alfanumerička imena
 	if( ctype_alnum( $_POST['username'] ) )
+	{
 		$username = $_POST['username'];
+	 	$ime = $_POST['name']. " " . $_POST['lastname'];
+	}
 	else {
 		echo 'Korisničko ime smije imati samo slova i znamenke!<br />';
 		return false;
 	}
 		
 	// Spremi usera u bazu podataka.
-	$st = DB::get()->prepare( 'INSERT INTO users (username, password) VALUES ' .
-	                                            '(:username, :password)' );
+	$st = DB::get()->prepare( 'INSERT INTO KORISTNIK (username, password,ime, dozvola) VALUES ' .
+	                                            '(:username, :password, :ime, :dozvola)' );
 		
 	$error = DB::get()->errorInfo();
 	if( isset( $error[2] ) ) {	
@@ -51,7 +54,9 @@ function addUserToDatabase()
 	}
                                             	
 	$st->execute( array( 'username' => $username, 
-	                     'password' => $hashed_password ) );                                        
+	                     'password' => $hashed_password,
+	                     'ime' => $ime,
+	                     'dozvola' => 0 ) );                                        
 
 	$error = $st->errorInfo();
 	if( isset( $error[2] ) ) {	
@@ -96,7 +101,7 @@ function verifyLogin()
 		echo 'Taj username ne postoji!<br />';
 		return false;
 	}
-
+	echo $hashed_password;
 	if( password_verify( $_POST['password'], $hashed_password ) ) 
 		return true;
 	else {
