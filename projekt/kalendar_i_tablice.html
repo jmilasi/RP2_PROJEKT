@@ -76,7 +76,7 @@
 					};
 
 				var fil = {datum: date, predavaonica: room};
-				$.ajax("json.php", {
+				$.ajax("raspored.php", {
 				    type: "POST",
 			    	contentType: "application/json",
 				    data: JSON.stringify(fil),
@@ -85,14 +85,33 @@
 			    		$("#raspored").append(
 			    			"<tr><th>SAT</th>" +
 			    			"<th>IME KOLEGIJA</th>" +
-			    			"<th>PREDAVAČ</th></tr>");
-			    		for (var i = 0; i < data.length; ++i)
-			    			$("#raspored").append(
+			    			"<th>PREDAVAČ</th>" +
+			    			"<th>DOZVOLA MIJENJANJA</th></tr>");
+			    		
+			    		var sat = 8;
+
+			    		for (var i = 0; i < data.length; ++i) {
+			    			while (sat < data[i].sat) {
+			    				$("#raspored").append(
+				    				"<tr><td>" + sat + 
+				    				"</td><td>" + "-" +
+				    				"</td><td>" + "-" +
+				    				"</td><td>" + "0" +
+				    				"</td></tr>");
+			    				++sat;
+			    			}
+
+		    				$("#raspored").append(
 			    				"<tr><td>" + data[i].SAT + 
 			    				"</td><td>" + data[i].IME_KOLEGIJA +
 			    				"</td><td>" + data[i].PREDAVAC +
+			    				"</td><td>" + data[i].DOZVOLA +
 			    				"</td></tr>");
+		    				++sat;
 				    	}
+
+				    	$("#raspored").style.visibility = "visible";
+				    }
 		    	});
 			});
 		});

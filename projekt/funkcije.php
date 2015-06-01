@@ -23,7 +23,6 @@ class DB
 		return self::$db;
 	}
 }
-
 function addUserToDatabase()
 {
 	if( !isset( $_POST['username'] ) || !isset( $_POST['password'] ) )
@@ -44,8 +43,8 @@ function addUserToDatabase()
 	}
 		
 	// Spremi usera u bazu podataka.
-	$st = DB::get()->prepare( 'INSERT INTO KORISTNIK (username, password,ime, dozvola) VALUES ' .
-	                                            '(:username, :password, :ime, :dozvola)' );
+	$st = DB::get()->prepare( 'INSERT INTO KORISNIK (USERNAME, PASSWORD, PREDAVAC, ADMIN) VALUES ' .
+	                                            '(:username, :password, :ime, :admin)' );
 		
 	$error = DB::get()->errorInfo();
 	if( isset( $error[2] ) ) {	
@@ -56,7 +55,7 @@ function addUserToDatabase()
 	$st->execute( array( 'username' => $username, 
 	                     'password' => $hashed_password,
 	                     'ime' => $ime,
-	                     'dozvola' => 0 ) );                                        
+	                     'admin' => 0 ) );                                        
 
 	$error = $st->errorInfo();
 	if( isset( $error[2] ) ) {	
@@ -101,7 +100,6 @@ function verifyLogin()
 		echo 'Taj username ne postoji!<br />';
 		return false;
 	}
-	echo $hashed_password;
 	if( password_verify( $_POST['password'], $hashed_password ) ) 
 		return true;
 	else {
@@ -109,20 +107,20 @@ function verifyLogin()
 		return false;
 	}
 }
-function dozvola($predavaonica, $datum){
-	if( !isset( $predavaonica ) || !isset( $datum ) )
-		return false;
-
-	if( ctype_alnum( $predavaonica ) && ctype_alnum( $predavaonica ))
+function rezerviraj($predavaonica, $datum, $sat, $ime_kolegija){ 
+	if( !isset( $predavaonica ) || !isset( $datum ) || !isset( $sat ) )
 	{
+		echo "Popunite podatke do kraja!";
+		return false;	
+	}	
 
-	}
-	else {
+	if( !ctype_alnum( $predavaonica ) && !ctype_alnum( $datum )&& !ctype_alnum( $sat ))
+	{
 		echo 'Greška u podacima predavaonice i datuma!<br />';
 		return false;
 	}
-	//-----------------------------------------------
-	$st1 = DB::get()->prepare( 'SELECT * FROM REZERVIRA WHERE BROJ_SOBE = :predavaonica AND DATUM = :datum' );
+	//---------------------PROVJERA REZERVIRA LI TKO--------------------------
+	$st = DB::get()->prepare( 'SELECT * FROM OBRADA WHERE BROJ_SOBE = :predavaonica AND DATUM = :datum' );
 
 	$error = DB::get()->errorInfo();
 	if( isset( $error[2] ) ) {	
@@ -130,21 +128,21 @@ function dozvola($predavaonica, $datum){
 		return false;
 	}
 
-	$st1->execute( array( 'predavaonica' => $predavaonica, 'datum' => $datum) );
+	$st->execute( array( 'predavaonica' => $predavaonica, 'datum' => $datum) );
 
-	$error = $st1->errorInfo();
+	$error = $st->errorInfo();
 	if( isset( $error[2] ) ) {	
 		echo '$st->execute error: ' . $error[2];
 		return false;
 	}
 
-	 $st1->fetchColumn();
-	if( ($st1->fetchColumn()) ) {
+	 $st->fetchColumn();
+	if( ($st->fetchColumn()) ) {
 		return false;
-	}
+	} 
 	//-----------------------------------------------------------------
 	// Spremi usera u bazu podataka.
-	$st2 = DB::get()->prepare( 'INSERT INTO REZERVIRA(BROJ_SOBE, DATUM) VALUES ' .
+	$st = DB::get()->prepare( 'INSERT INTO REZERVIRA(BROJ_SOBE, DATUM) VALUES ' .
 	                                            '(:predavaonica, :datum)' );
 
 	$error = DB::get()->errorInfo();
@@ -153,18 +151,89 @@ function dozvola($predavaonica, $datum){
 		return false;
 	}
                                             	
-	$st2->execute( array( 'predavaonica' => $predavaonica, 
+	$st->execute( array( 'predavaonica' => $predavaonica, 
 	                     'datum' => $datum ) );                                        
 
-	$error = $st2->errorInfo();
+	$error = $st->errorInfo();
 	if( isset( $error[2] ) ) {	
 		echo '$st->execute error: ' . $error[2];
 		return false;
 	}
 
-	// TREBA DODATI DODAVAJE U BAZU TOGA PREDMETA, PRVO UPIT NA IME USERNAME!!-->Jure će sredit!
+	//-- Dobavi ime od username---
+	$st = DB::get()->prepare( 'SELECT PREDAVAC FROM KORISNIK WHERE USERNAME = :username' );
+
+	$error = DB::get()->errorInfo();
+	if( isset( $error[2] ) ) {	
+		echo 'DB::get()->prepare error: ' . $error[2];
+		return false;
+	}
+
+	$st->execute( array( 'username' => $username ) );
+
+	$error = $st->errorInfo();
+	if( isset( $error[2] ) ) {	
+		echo '$st->execute error: ' . $error[2];
+		return false;
+	}
+
+	$predavac = $st->fetchColumn();
+	//----- DODAJ REZERVIRANI TERMIN----
+		// Spremi usera u bazu podataka.
+	$st = DB::get()->prepare( 'INSERT INTO REZERVACIJE(PREDAVAONICA, DATUM, SAT, PREDAVAC, IME_KOLEGIJA, DOZVOLA) VALUES ' .
+	                                            '(:predavaonica, :datum, :sat, :predavac, :ime_kolegija, :dozvola)' );
+
+	$error = DB::get()->errorInfo();
+	if( isset( $error[2] ) ) {	
+		echo 'DB::get()->prepare error: ' . $error[2];
+		return false;
+	}
+                                            	
+	$st->execute( array( 'predavaonica' => $predavaonica, 
+	                     'datum' => $datum,
+	                     'sat' => $sat,
+	                     'predavac'=> $predavac,
+	                     'ime_kolegija' => $ime_kolegija,
+	                     'dozvola' => 1 ));                                        
+
+	$error = $st->errorInfo();
+	if( isset( $error[2] ) ) {	
+		echo '$st->execute error: ' . $error[2];
+		return false;
+	}
 
 	return true;                                                                               	
 
+
+}
+
+function ponisti_rezervaciju($predavaonica, $datum, $sat){
+	if( !isset( $predavaonica ) || !isset( $datum ) )
+		return false;
+
+	if( !ctype_alnum( $predavaonica ) && !ctype_alnum( $datum) && !ctype_alnum($sat))
+	{
+		echo 'Greška u poslanim podacima!<br />';
+		return false;
+	}
+	$st = DB::get()->prepare( 'DELETE FROM REZERVACIJE WHERE PREDAVAONICA = :predavaonica, DATUM = :datum, SAT = :sat');
+
+	$error = DB::get()->errorInfo();
+	if( isset( $error[2] ) ) {	
+		echo 'DB::get()->prepare error: ' . $error[2];
+		return false;
+	}
+                                            	
+	$st->execute( array( 'predavaonica' => $predavaonica, 
+	                     'datum' => $datum,
+	                     'sat' => $sat ));                                        
+
+	$error = $st->errorInfo();
+	if( isset( $error[2] ) ) {	
+		echo '$st->execute error: ' . $error[2];
+		return false;
+	}
+
+	return true;           
 
 }

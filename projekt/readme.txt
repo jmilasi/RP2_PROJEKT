@@ -1,4 +1,4 @@
-git log--> vrati povijet promjena.
+
 Jure napisao: 27.5
 Ivan:
 ->kalendar_i_tablica.html:
@@ -15,3 +15,8 @@ Opcenito:
 31.05.
 	-nama ne treba ovaj login.html, dovoljan nam je samo login.php
 	- isprava smo stavili samo_pregledaj.php, no prebacit ćemo to na .html
+
+1.6.
+	-srediti provjeru ime kolegija i ime korisnika! zbog " "
+
+
