@@ -1,1 +1,0 @@
-Što zapravo trebam napraviti kad mi on posalje link. Dobro, dam mu dozvolu na 1. No, trebam li ga ostaviti ulogiranog ili ne? Ako ima više sa istim kodom, onda možda ne treba.

@@ -216,7 +216,7 @@ function ponisti_rezervaciju($predavaonica, $datum, $sat){
 		echo 'Greška u poslanim podacima!<br />';
 		return false;
 	}
-	$st = DB::get()->prepare( 'DELETE FROM REZERVACIJE WHERE PREDAVAONICA = :predavaonica, DATUM = :datum, SAT = :sat');
+	$st = DB::get()->prepare( 'DELETE FROM REZERVACIJE WHERE PREDAVAONICA = :predavaonica AND DATUM = :datum AND SAT = :sat');
 
 	$error = DB::get()->errorInfo();
 	if( isset( $error[2] ) ) {	
