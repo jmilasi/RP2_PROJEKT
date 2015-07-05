@@ -76,7 +76,7 @@
                         var fil = {datum: date, predavaonica: room};
                         console.log( fil );
                         
-                        $.ajax("raspored.php", {
+                        $.ajax("raspored.php?fff=ksjdbvnvbnfhksjdh", {
                             type: "POST",
                             contentType: "application/json",
                             data: JSON.stringify(fil),
@@ -84,9 +84,10 @@
 								//console.log(data[0]);
 								
 								if( typeof( data ) === "string" ) {
-									alert( data);
+									alert( data );
 									return;
-								} 
+								}
+								
                                 $("#raspored").text("");
                                 $("#raspored").append(
                                     "<tr><th>SAT</th>" +
@@ -94,29 +95,20 @@
                                     "<th>PREDAVAČ</th>" +
                                     "<th>DOZVOLA MIJENJANJA</th></tr>");
           
-                                var j = 0;
-                                for(var i = 8; i < 20; i++){
+                                
+                         
 
-                                    if(j < data.length && data[j].SAT === i.toString()){ // i je tip number, a data[j].sat je string
-                                     $("#raspored").append(
-                                         "<tr><td>" + data[j].SAT + " - " + (Number(data[j].SAT) + 1)+ 
-                                         "</td><td>" + data[j].IME_KOLEGIJA +
-                                         "</td><td>" + data[j].PREDAVAC +
-                                         "</td><td>" + data[j].DOZVOLA +
-                                         "</td></tr>");
-                                     j++
-                                    }
-                                    else
-                                    {
-                                        $("#raspored").append(
-                                         "<tr><td>" + i + " - " + (i+1)+ 
-                                         "</td><td>" + ""+
-                                         "</td><td>" + ""+
-                                         "</td><td>" + ""+
-                                         "</td></tr>"); 
-                                    }
-                                 
-                                }
+                                for (var i = 0; i < data.length; ++i) {
+                    
+
+                                    $("#raspored").append(
+                                        "<tr><td>" + data[i].SAT + 
+                                        "</td><td>" + data[i].IME_KOLEGIJA +
+                                        "</td><td>" + data[i].PREDAVAC +
+                                        "</td><td>" + data[i].DOZVOLA +
+                                        "</td></tr>");
+                                
+                                } 
 
                                 document.getElementById("raspored").style.visibility = "visible";
                             }
