@@ -7,35 +7,9 @@
     <link rel="stylesheet" type="text/css" media="all"
         href="jsDatePick_ltr.min.css" />
     <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
-    <script src="jquery-2.1.4.min.js">
-    </script>
+    <script src="jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" type="text/css" href = "css/stil.css">
 
-    <style type="text/css">
-        #calendar {
-            margin: 10px 0 30px 0;
-            border-width: 1px;
-            border-style: dashed;
-            border-color: black;
-            width: 205px;
-            height: 230px;
-        }
-        table, td {
-            border-width: 5px;
-            border-style: solid;
-            border-color: black;
-        }
-        table {
-            width: 90%;
-        }
-        td {
-            height: 50px;
-            text-align: center;
-            font-size: 18pt;
-        }
-        td:hover {
-            background-color: aqua;
-        }
-    </style>
 
 </head>
 
@@ -87,53 +61,63 @@
 									alert( data);
 									return;
 								} 
-                                  document.getElementById("raspored").style.visibility = "visible";
 								$("#tekst").text("Raspored predavaonice "+ room + " za datum: "+ date);
                                 $("#raspored").text("");
                                 $("#raspored").append(
                                     "<tr><th>SAT</th>" +
                                     "<th>IME KOLEGIJA</th>" +
                                     "<th>PREDAVAČ</th>" +
-                                    "</tr>");
-                                
-                                var i = 8,j = 0;
-                                var ponovi = 0;
-                                while(i<=20) {
+                                    "<th>DOZVOLA MIJENJANJA</th></tr>");
+          
+                                var j = 0;
+                                for(var i = 8; i < 20; i++){
 
-                                    if(data[j].SAT === i.toString() && j < data.length){ // i je tip number, a data[j].sat je string 
-                                            var pamti = data[j].IME_KOLEGIJA;
-                                            while(j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) { ponovi++; i++; }
+                                    if(j < data.length && data[j].SAT === i.toString()){ // i je tip number, a data[j].sat je string
+                                        if( data[j].DOZVOLA == 1 )
+                                        { 
                                             $("#raspored").append(
-                                            "<tr><td>" + (i-ponovi).toString() + " - " + i.toString() + 
+                                            "<tr><td>" + data[j].SAT + " - " + (Number(data[j].SAT) + 1)+ 
                                             "</td><td>" + data[j].IME_KOLEGIJA +
                                             "</td><td>" + data[j].PREDAVAC +
+                                            "</td><td>" + "<input type = 'button' name = 'ponisti' value = 'poništi rezervaciju'>" +
                                             "</td></tr>");
-                                        j += ponovi;
-                                        ponovi = 0;
+                                        }
+                                        else
+                                        {
+                                            $("#raspored").append(
+                                            "<tr><td>" + data[j].SAT + " - " + (Number(data[j].SAT) + 1)+ 
+                                            "</td><td>" + data[j].IME_KOLEGIJA +
+                                            "</td><td>" + data[j].PREDAVAC +
+                                            "</td><td>" + 
+                                            "" +
+                                            "</td></tr>"); 
+                                        }
+                                        j++
 
                                     }
                                     else
                                     {
-                                        if( j < data.length )
-                                            while(!(data[j].SAT === i.toString())) { ponovi++; i++; } 
-                                        else{
-                                                while(i <= 20) 
-                                                {
-                                                    ponovi++;
-                                                    i++;
-                                                }
-                                            }
-                                            
                                         $("#raspored").append(
-                                         "<tr><td>" + (i-ponovi).toString() + " - " + i.toString() + 
+                                         "<tr><td>" + i + " - " + (i+1)+ 
                                          "</td><td>" + ""+
                                          "</td><td>" + ""+
+                                         "</td><td>" + "<input type = 'button' name = 'rezerviraj' value = 'rezerviraj'>"+
                                          "</td></tr>"); 
-                                        ponovi = 0;
                                     }
                                  
-                                }                            
+                                }
+
+                                document.getElementById("raspored").style.visibility = "visible";
+                                var t = document.getElementsByName("rezerviraj");
+                                console.log(t.length);
+                                for( var i = 0; i < t.length; ++ i){
+                                    t[i].onclick = function(event)
+                                            {
+                                                alert("Rezerviraj!");
+                                            }   
+                                }
                             }
+                        
                         });
                     }; 
             });
