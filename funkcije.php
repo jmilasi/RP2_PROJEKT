@@ -119,7 +119,7 @@ function rezerviraj($predavaonica, $datum, $sat, $ime_kolegija){
 		return false;
 	}
 	//---------------------PROVJERA REZERVIRA LI TKO--------------------------
-	$st = DB::get()->prepare( 'SELECT * FROM OBRADA WHERE BROJ_SOBE = :predavaonica AND DATUM = :datum' );
+	$st = DB::get()->prepare( 'SELECT * FROM OBRADA WHERE PREDAVAONICA = :predavaonica AND DATUM = :datum' );
 
 	$error = DB::get()->errorInfo();
 	if( isset( $error[2] ) ) {	
@@ -137,6 +137,7 @@ function rezerviraj($predavaonica, $datum, $sat, $ime_kolegija){
 
 	 $st->fetchColumn();
 	if( ($st->fetchColumn()) ) {
+		echo 'Rezervacija u tjeku...';
 		return false;
 	} 
 	//-----------------------------------------------------------------
