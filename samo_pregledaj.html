@@ -42,17 +42,19 @@
 <body>   
     <div id="calendar"></div>
 
-    <div id="predavaonice" align="center">
-       
-    </div>
-    <h2 id = "tekst" align = "center"> </h2>
+    <table id="predavaonice" align="center" style="visibility: hidden";>
+        <tr><td>001</td><td>002</td><td>003</td></tr>
+        <tr><td>004</td><td>005</td><td>006</td></tr>
+        <tr><td>110</td><td>201</td><td>A101</td></tr>
+    </table>
+
     <table id="raspored" align="center" style="visibility: hidden">
     </table>
 
     <script type="text/javascript">
         $(document).ready(function() {
             var date, room;
-             var pred = "<table id = 'sobe'><tr><td>001</td><td>002</td><td>003</td></tr><tr><td>004</td><td>005</td><td>006</td></tr><tr><td>110</td><td>201</td><td>A101</td></tr></table>";
+
             globalObject = new JsDatePick({
                 useMode: 1,
                 isStripped: true,
@@ -60,22 +62,20 @@
             });
 
             globalObject.setOnSelectedDelegate(function() {
-            	$("#raspored").text(""); //obrise nam raspored prilikom klika na datum
-            	$("#tekst").text(""); //obrsi što piše
                 var obj = globalObject.getSelectedDay();
                 date = obj.day + "." + obj.month + "." + obj.year + ".";
                 var predavaonice = document.getElementById("predavaonice");
-                predavaonice.innerHTML = pred;   //stvori nam tablicu predavaonica      
+                predavaonice.style.visibility = "visible";          
                 
                 tds = document.getElementsByTagName("td");
                 for (var i = 0; i < tds.length; ++i)
-                    tds[i].onclick = function() {  
+                    tds[i].onclick = function() {
                         room = this.innerHTML;
                         alert("Datum: " + date + "\n" + "Predavaonica: " +
                             room);
                         var fil = {datum: date, predavaonica: room};
                         console.log( fil );
-                        document.getElementById("sobe").remove();  //obrise nam listu predavaonica kada kliknemo na njega.
+                        
                         $.ajax("raspored.php", {
                             type: "POST",
                             contentType: "application/json",
@@ -84,55 +84,32 @@
 								//console.log(data[0]);
 								
 								if( typeof( data ) === "string" ) {
-									alert( data);
+									alert( data );
 									return;
-								} 
-                                  document.getElementById("raspored").style.visibility = "visible";
-								$("#tekst").text("Raspored predavaonice "+ room + " za datum: "+ date);
+								}
                                 $("#raspored").text("");
                                 $("#raspored").append(
                                     "<tr><th>SAT</th>" +
                                     "<th>IME KOLEGIJA</th>" +
                                     "<th>PREDAVAČ</th>" +
-                                    "</tr>");
+                                    "<th>DOZVOLA MIJENJANJA</th></tr>");
+          
                                 
-                                var i = 8,j = 0;
-                                var ponovi = 0;
-                                while(i<=20) {
+                         
 
-                                    if(data[j].SAT === i.toString() && j < data.length){ // i je tip number, a data[j].sat je string 
-                                            var pamti = data[j].IME_KOLEGIJA;
-                                            while(j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) { ponovi++; i++; }
-                                            $("#raspored").append(
-                                            "<tr><td>" + (i-ponovi).toString() + " - " + i.toString() + 
-                                            "</td><td>" + data[j].IME_KOLEGIJA +
-                                            "</td><td>" + data[j].PREDAVAC +
-                                            "</td></tr>");
-                                        j += ponovi;
-                                        ponovi = 0;
+                                for (var i = 0; i < data.length; ++i) {
+                    
 
-                                    }
-                                    else
-                                    {
-                                        if( j < data.length )
-                                            while(!(data[j].SAT === i.toString())) { ponovi++; i++; } 
-                                        else{
-                                                while(i <= 20) 
-                                                {
-                                                    ponovi++;
-                                                    i++;
-                                                }
-                                            }
-                                            
-                                        $("#raspored").append(
-                                         "<tr><td>" + (i-ponovi).toString() + " - " + i.toString() + 
-                                         "</td><td>" + ""+
-                                         "</td><td>" + ""+
-                                         "</td></tr>"); 
-                                        ponovi = 0;
-                                    }
-                                 
-                                }                            
+                                    $("#raspored").append(
+                                        "<tr><td>" + data[i].SAT + 
+                                        "</td><td>" + data[i].IME_KOLEGIJA +
+                                        "</td><td>" + data[i].PREDAVAC +
+                                        "</td><td>" + data[i].DOZVOLA +
+                                        "</td></tr>");
+                                
+                                } 
+
+                                document.getElementById("raspored").style.visibility = "visible";
                             }
                         });
                     }; 

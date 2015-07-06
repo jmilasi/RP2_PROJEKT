@@ -48,28 +48,32 @@ if(isset($datum) && isset($predavaonica) && ctype_alnum( $predavaonica ) )
 	$st1 = DB::get()->prepare( 'SELECT SAT, IME_KOLEGIJA, PREDAVAC, DOZVOLA FROM BAZNI_RASPORED WHERE DAN = :dan_u_tj AND PREDAVAONICA = :predavaonica ORDER BY SAT');
 	$error = DB::get()->errorInfo();
 	if( isset( $error[2] ) ) {	
-		echo 'DB::get()->prepare error: ' . $error[2];
+		//echo 'DB::get()->prepare error: ' . $error[2];
 		return false;
 	}
 
 	$st1->execute( array( 'dan_u_tj' => $dan_u_tj, 
 	                     'predavaonica' => $predavaonica
-	                     ) );                                 
+	                     ) );                                        
 
 
-	$error = $st1->errorInfo();
+	$error = $st1->errorInfo( array( 'DATUM' => $datum, 'PREDAVAONICA' => $predavaonica ));
 	if( isset( $error[2] ) ) {	
-		echo '$st->execute error: ' . $error[2];
+		//echo '$st->execute error: ' . $error[2];
 		return false;
 	}
-	//$ret =array( array( 'SAT' => '8',  'IME_KOLEGIJA' => 'ANALIZA',  'PREDAVAC' => 'PAZANIN', 'DOZVOLA' => 0 ));
-	$ret = array();
+	//$ret =array( array( 'SAT' => '8',  'IME_KOLEGIJA' => 'ANALIZA',  'PREDAVAC' => 'PAZANIN', 'DOZVOLA' => 0 )); 
+	
 	while( $row = $st1->fetch() )
 			$ret[] = $row;
+	foreach ($variable as $key => $value) {
+		echo $value '<br/>';
+	}
 	
 	header( 'Content-Type: application/json' );
 
 	echo json_encode( $ret );
 }
+
 
 ?>
