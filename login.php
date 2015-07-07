@@ -1,6 +1,5 @@
 <?php
 include_once "funkcije.php";
-include_once "podaci.php";
 
 session_start();
 
@@ -33,7 +32,7 @@ if (isset($username) && isset($_POST["logout"])) {
     <link rel="stylesheet" type="text/css" media="all" href="jsDatePick_ltr.min.css" />
     <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
     <script src="jquery-2.1.4.min.js"></script>
-    <link rel="stylesheet" type="text/css" href = "css/stil.css">
+    <link rel="stylesheet" type="text/css" href="css/stil.css">
 </head>
 
 <body>
@@ -49,7 +48,7 @@ if (isset($username) && isset($_POST["logout"])) {
         $st->execute(array("username" => $username));
         $tko = $st->fetchColumn();
         $_SESSION["tko"] = $tko;
-        echo "Dobro došli, " . $_SESSION["tko"]. "<br />"; ?>
+        echo "Korisnik: " . $_SESSION["tko"]. "<br />"; ?>
         
         <form method="POST" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>">
             <input type="hidden" name="logout" />
@@ -76,7 +75,7 @@ if (isset($username) && isset($_POST["logout"])) {
                 });
 
                 globalObject.setOnSelectedDelegate(function() {
-                    $("#raspored").text(""); // obriši nam raspored prilikom klika na datum
+                    $("#raspored").text(""); // obriši raspored prilikom klika na datum
                     $("#tekst").text(""); // obriši što piše
                     var obj = globalObject.getSelectedDay();
                     date = obj.day + "." + obj.month + "." + obj.year + ".";
@@ -84,19 +83,18 @@ if (isset($username) && isset($_POST["logout"])) {
                     predavaonice.innerHTML = pred; // tablica predavaonica      
                 
                     tds = document.getElementsByTagName("td");
-                    var tablica_ispisana = 0;
                     for (var i = 0; i < tds.length; ++i) {
                         tds[i].onclick = function() {
-                            room = this.innerHTML;                        
+                            room = this.innerHTML;                     
                             var fil = {datum: date, predavaonica: room};
-                            document.getElementById("sobe").remove(); // obriši listu predavaonica kada kliknemo na nju
+                            document.getElementById("sobe").remove(); // obriši listu predavaonica prilikom klika na nju
                             $.ajax("raspored.php", {
                                 type: "POST",
                                 contentType: "application/json",
                                 data: JSON.stringify(fil),
                                 success: function(data) {
                                     if (typeof(data) === "string") {
-                                        alert("Greška u dohvacanju podataka...");
+                                        alert("Greška: " + data);
                                         return;
                                     }
                                     $("#tekst").text("Raspored predavaonice " + room + " za " + date);
@@ -136,7 +134,6 @@ if (isset($username) && isset($_POST["logout"])) {
                                             
                                             j += ponovi;
                                             ponovi = 0;
-
                                         }
 
                                         else {                                                                                
@@ -179,9 +176,8 @@ if (isset($username) && isset($_POST["logout"])) {
                                                 contentType: "application/json",
                                                 data: JSON.stringify(fil_rez),
                                                 success: function(data) {
-                                                    // alert(data);
                                                     if (typeof(data) === "string") {
-                                                        alert("Greška u dohvacanju podataka...");
+                                                        alert("Greška: " + data);
                                                         return;
                                                     }
                                                     $("#tekst").text("Raspored predavaonice " + room + " za " + date);
@@ -327,7 +323,6 @@ if (isset($username) && isset($_POST["logout"])) {
                                             }); // kraj ajax-a za poništavanje
                                         } // kraj onclick-funkcije kod poništavanja
                                     } // kraj for-petlje kod poništavanja
-                                    
                                 } // kraj success-funkcije kod ajax-a za raspored
                             }); // kraj ajaxa za raspored
                         }; // kraj onclick-funkcije za td-ove 
