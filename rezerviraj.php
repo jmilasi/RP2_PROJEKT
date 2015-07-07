@@ -10,8 +10,9 @@ $sat = $filter["sat"];
 $kolegij = $filter["kolegij"];
 $predavac = $filter["predavac"];
 $dan_u_tj = dan_u_tjednu($datum);
-
-if ($predavac != $_SESSION["tko"]) {
+if(isset($_SESSION["admin"]))
+	$admin = $_SESSION["admin"];
+if ($predavac != $_SESSION["tko"] && $admin == 0 ) {
 	$ret = "Ne možete rezervirati termin koji nije na Vaše ime!";
 	header("Content-Type: application/json");
 	echo json_encode($ret);

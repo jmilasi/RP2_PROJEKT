@@ -19,6 +19,7 @@ if (isset($username) && isset($_POST["logout"])) {
     session_unset();
     session_destroy();
     unset($username);
+
 }
 ?>
 
@@ -78,7 +79,10 @@ if (isset($username) && isset($_POST["logout"])) {
 
 	function ispis(data){
 			if (typeof(data) === "string") {
-			    alert("Greška: " + data);
+			    alert("Greška sdadasd: " + data);
+			    document.getElementById('povratak').style.visibility = "hidden";
+			    document.getElementById('calendar').style.visibility = "visible";
+			   
 			    return;
 			}
 			$("#tekst").text("Raspored predavaonice " + room + " za " + date);
@@ -200,6 +204,20 @@ if (isset($username) && isset($_POST["logout"])) {
             } // kraj for-petlje kod poništavanja
 
 	}
+	function obrada(date, room){
+		var fil_obrada = {datum: date, predavaonica: room};
+	    $.ajax("obrada.php", {
+	        type: "POST",
+	        contentType: "application/json",
+	        data: JSON.stringify(fil_obrada),
+	        success: function(data) {
+	            if (typeof(data) === "string") {
+	                alert(data);
+	                return;
+	            }
+	        }
+	    });
+	}
 	function klik(){
 	    $("#raspored").text(""); // obriši raspored prilikom klika na datum
 	    $("#tekst").text(""); // obriši što piše
@@ -214,18 +232,7 @@ if (isset($username) && isset($_POST["logout"])) {
 	            document.getElementById('povratak').style.visibility = "visible";                 
 			    document.getElementById("povratak").onclick = function()
 			    {
-			    	var fil_obrada = {datum: date, predavaonica: room};
-		            $.ajax("obrada.php", {
-		                type: "POST",
-		                contentType: "application/json",
-		                data: JSON.stringify(fil_obrada),
-		                success: function(data) {
-		                    if (typeof(data) === "string") {
-		                        alert(data);
-		                        return;
-		                    }
-		                }
-		            });
+			    	obrada(date, room);
 		            document.getElementById('povratak').style.visibility = "hidden";
 			    	$("#raspored").text(""); // obriši raspored prilikom klika na datum
 			   		$("#tekst").text(""); // obriši što piše
@@ -249,9 +256,15 @@ if (isset($username) && isset($_POST["logout"])) {
 	}
                 globalObject.setOnSelectedDelegate(function() {
                 	klik();
+                	
+					window.addEventListener("beforeunload", function(e) {
+			  			obrada(date, room);
+					}, false);
+					window.addEventListener("logout", function(e) {
+			  			obrada(date, room);
+					}, false);
                 }); // kraj globalObject-funkcije
             }); // kraj documentReady-funkcije
-
 
         </script>
         <?php
