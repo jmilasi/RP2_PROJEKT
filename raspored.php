@@ -44,8 +44,9 @@ $dan_u_tj = dan_u_tjednu($datum);
 
 if(isset($datum) && isset($predavaonica) && ctype_alnum( $predavaonica ) )
 {
-	if(isset($_SESSION['predavac']))		
-		$predavac = $_SESSION['predavac'];
+	if(isset($_SESSION['tko']))		
+		$tko = $_SESSION['tko'];
+	
 	$st1 = DB::get()->prepare(
 		'SELECT SAT, IME_KOLEGIJA, PREDAVAC, DOZVOLA FROM BAZNI_RASPORED WHERE DAN = :dan_u_tj AND PREDAVAONICA = :predavaonica
 		UNION SELECT SAT, IME_KOLEGIJA, PREDAVAC, DOZVOLA FROM REZERVACIJE WHERE DATUM = :datum AND PREDAVAONICA = :predavaonica
@@ -71,11 +72,11 @@ if(isset($datum) && isset($predavaonica) && ctype_alnum( $predavaonica ) )
 	while( $row = $st1->fetch() )
 			$ret[] = $row;
 
-	if (isset($predavac)) {
+	if (isset($tko)) {
 		for ($i = 0; $i < sizeof($ret); ++$i)
 			if ($ret[$i]['DOZVOLA'] == 1)
 			{
-				if($ret[$i]['PREDAVAC'] != $predavac)
+				if($ret[$i]['PREDAVAC'] != $tko)
 				{
 					$ret[$i]['DOZVOLA'] = 0;
 				}
@@ -83,7 +84,6 @@ if(isset($datum) && isset($predavaonica) && ctype_alnum( $predavaonica ) )
 	}
 
 	header( 'Content-Type: application/json' );
-	echo json_encode( $ret );
+	echo json_encode($ret);
 }
-
 ?>
