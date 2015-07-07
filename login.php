@@ -38,7 +38,7 @@ if (isset($username) && isset($_POST["logout"])) {
 <body>
 <?php
     if (isset($username)) {
-        $st = DB::get()->prepare("SELECT PREDAVAC FROM KORISNIK WHERE USERNAME=:username");
+        $st = DB::get()->prepare("SELECT PREDAVAC, ADMIN FROM KORISNIK WHERE USERNAME=:username");
         $error = DB::get()->errorInfo();
         if (isset($error[2])) {  
             echo "DB::get()->prepare error: " . $error[2];
@@ -46,8 +46,9 @@ if (isset($username) && isset($_POST["logout"])) {
         }
 
         $st->execute(array("username" => $username));
-        $tko = $st->fetchColumn();
-        $_SESSION["tko"] = $tko;
+        $tko = $st->fetch();
+        $_SESSION["tko"] = $tko['PREDAVAC'];
+        $_SESSION["admin"] = $tko['ADMIN'];
         echo "Korisnik: " . $_SESSION["tko"]. "<br />"; ?>
         
         <form method="POST" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>">
@@ -55,6 +56,7 @@ if (isset($username) && isset($_POST["logout"])) {
             <input type="submit" value="Log Out" />
         </form>
 
+        <input type ="button" id = "povratak" value = "povratak" style="visibility: hidden" >
         <div id="calendar"></div>
         <div id="predavaonice" align="center"></div>
         <h2 id="tekst" align="center"></h2>
@@ -74,261 +76,183 @@ if (isset($username) && isset($_POST["logout"])) {
                     target: "calendar"
                 });
 
+	function ispis(data){
+			if (typeof(data) === "string") {
+			    alert("Greška: " + data);
+			    return;
+			}
+			$("#tekst").text("Raspored predavaonice " + room + " za " + date);
+			$("#raspored").text("");
+			$("#raspored").append(
+			    "<tr><th>SAT</th>" +
+			    "<th>IME KOLEGIJA</th>" +
+			    "<th>PREDAVAČ</th>" +
+			    "<th>Radnja</th></tr>");
+			var i = 8, j = 0;
+			var ponovi = 0;
+			while (i < 20) {
+			    // i je number, a data[j].sat je string
+			    if (j < data.length && data[j].SAT === i.toString()) { 
+			        var pamti = data[j].IME_KOLEGIJA;
+			        while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
+			            ponovi++;
+			            i++;
+			        }
+
+			        if (data[j].DOZVOLA == 1 ) {
+			            $("#raspored").append(
+			                "<tr><td>" + data[j].SAT + " - " + i.toString() + 
+			                "</td><td>" + data[j].IME_KOLEGIJA +
+			                "</td><td>" + data[j].PREDAVAC +
+			                "</td><td>" + "<input type='button' name='ponisti' value='poništi rezervaciju'>" +
+			                "</td></tr>");
+			        }
+
+			        else {
+			            $("#raspored").append(
+			                "<tr><td>" + data[j].SAT + " - " + i.toString() + 
+			                "</td><td>" + data[j].IME_KOLEGIJA +
+			                "</td><td>" + data[j].PREDAVAC +
+			                "</td><td>" + " " +
+			                "</td></tr>");
+			        }
+			        
+			        j += ponovi;
+			        ponovi = 0;
+
+			    }
+
+			    else {                                                                                
+			        $("#raspored").append(
+			            "<tr><td>" + i + " - " + (i+1) + 
+			            "</td><td>" + "<textarea name='kolegij' placeholder='Kolegij..'></textarea>"+
+			            "</td><td>" + "<textarea name='predavac' placeholder='Predavač..'></textarea>"+
+			            "</td><td>" + "<input type='button' name='rezerviraj' value='rezerviraj'>"+
+			            "</td></tr>"); 
+			        i++;
+			    }
+			    document.getElementById("raspored").style.visibility = "visible";
+			} 
+			var rez = document.getElementsByName("rezerviraj");
+            for (var i = 0; i < rez.length; ++i) {
+                rez[i].onclick = function(event) {
+                    var td = event.target.parentNode;
+                    var tr = td.parentNode;
+                    var td1 = tr.children[0]; 
+                    var td2 = tr.children[1]; 
+                    var td3 = tr.children[2];
+                    var _sat = td1.innerHTML;
+                    _sat = _sat.substring(0, _sat.indexOf(' '));
+                    var _kolegij = td2.children[0].value;
+                    var _predavac = td3.children[0].value;
+
+                    var fil_rez = {
+                        datum: date,
+                        predavaonica: room,
+                        sat: _sat,
+                        kolegij: _kolegij,
+                        predavac: _predavac,
+                    };
+
+                    $.ajax("rezerviraj.php", {
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(fil_rez),
+                        success: function(data) {
+                                ispis(data);
+                                return;
+                        } // kraj success-funkcije kod ajax-a za rezervaciju
+                    }); // kraj ajax-a za rezervaciju
+                } // kraj onclick-funkcije kod rezervacije
+            } // kraj for-petlje kod rezervacije
+		     // poništavanje rezervacije predavaonice
+            var pon = document.getElementsByName("ponisti");
+            for (var i = 0; i < pon.length; ++i) {
+                pon[i].onclick = function(event) {
+                    var td = event.target.parentNode;
+                    var tr = td.parentNode;
+                    var td1 = tr.children[0]; 
+                    var td2 = tr.children[1]; 
+                    var td3 = tr.children[2];
+                    var _sat = td1.innerHTML;
+                    _sat = _sat.substring(0, _sat.indexOf(' '));
+                    var _kolegij = td2.innerHTML;
+                    var _predavac = td3.innerHTML;
+                    
+                    var fil_pon = {
+                        datum: date,
+                        predavaonica: room,
+                        sat: _sat,
+                        kolegij: _kolegij,
+                        predavac: _predavac,
+                    };
+
+                    $.ajax("ponisti.php", {
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(fil_pon),
+                        success: function(data) {
+                          ispis(data);
+                          return
+                        } // kraj success-funkcije kod ajax-a za poništavanje
+                    }); // kraj ajax-a za poništavanje
+                } // kraj onclick-funkcije kod poništavanja
+            } // kraj for-petlje kod poništavanja
+
+	}
+	function klik(){
+	    $("#raspored").text(""); // obriši raspored prilikom klika na datum
+	    $("#tekst").text(""); // obriši što piše
+	    var obj = globalObject.getSelectedDay();
+	    date = obj.day + "." + obj.month + "." + obj.year + ".";
+	    var predavaonice = document.getElementById("predavaonice");
+	    predavaonice.innerHTML = pred; // tablica predavaonica      
+	    tds = document.getElementsByTagName("td");
+	    for (var i = 0; i < tds.length; ++i) {
+	        tds[i].onclick = function() {
+	            room = this.innerHTML;    
+	            document.getElementById('povratak').style.visibility = "visible";                 
+			    document.getElementById("povratak").onclick = function()
+			    {
+			    	var fil_obrada = {datum: date, predavaonica: room};
+		            $.ajax("obrada.php", {
+		                type: "POST",
+		                contentType: "application/json",
+		                data: JSON.stringify(fil_obrada),
+		                success: function(data) {
+		                    if (typeof(data) === "string") {
+		                        alert(data);
+		                        return;
+		                    }
+		                }
+		            });
+		            document.getElementById('povratak').style.visibility = "hidden";
+			    	$("#raspored").text(""); // obriši raspored prilikom klika na datum
+			   		$("#tekst").text(""); // obriši što piše
+			    	document.getElementById('calendar').style.visibility = "visible";
+			    	return;
+			    }
+	            var fil = {datum: date, predavaonica: room};
+	            document.getElementById("sobe").remove(); // obriši listu predavaonica prilikom klika na nju
+	            document.getElementById('calendar').style.visibility = "hidden";
+	            $.ajax("raspored.php", {
+	                type: "POST",
+	                contentType: "application/json",
+	                data: JSON.stringify(fil),
+	                success: function(data) {
+	                  ispis(data);
+	                                                                                     
+	                } // kraj success-funkcije kod ajax-a za raspored
+	            }); // kraj ajaxa za raspored
+	        }; // kraj onclick-funkcije za td-ove 
+	    } // kraj for-petlje po td-ovima
+	}
                 globalObject.setOnSelectedDelegate(function() {
-                    $("#raspored").text(""); // obriši raspored prilikom klika na datum
-                    $("#tekst").text(""); // obriši što piše
-                    var obj = globalObject.getSelectedDay();
-                    date = obj.day + "." + obj.month + "." + obj.year + ".";
-                    var predavaonice = document.getElementById("predavaonice");
-                    predavaonice.innerHTML = pred; // tablica predavaonica      
-                
-                    tds = document.getElementsByTagName("td");
-                    for (var i = 0; i < tds.length; ++i) {
-                        tds[i].onclick = function() {
-                            room = this.innerHTML;                     
-                            var fil = {datum: date, predavaonica: room};
-                            document.getElementById("sobe").remove(); // obriši listu predavaonica prilikom klika na nju
-                            $.ajax("raspored.php", {
-                                type: "POST",
-                                contentType: "application/json",
-                                data: JSON.stringify(fil),
-                                success: function(data) {
-                                    if (typeof(data) === "string") {
-                                        alert("Greška: " + data);
-                                        return;
-                                    }
-                                    $("#tekst").text("Raspored predavaonice " + room + " za " + date);
-                                    $("#raspored").text("");
-                                    $("#raspored").append(
-                                        "<tr><th>SAT</th>" +
-                                        "<th>IME KOLEGIJA</th>" +
-                                        "<th>PREDAVAČ</th>" +
-                                        "<th>Radnja</th></tr>");
-                                    var i = 8, j = 0;
-                                    var ponovi = 0;
-                                    while (i < 20) {
-                                        if (j < data.length && data[j].SAT === i.toString()) { // i je tip number, a data[j].sat je string 
-                                            var pamti = data[j].IME_KOLEGIJA;
-                                            while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
-                                                ponovi++;
-                                                i++;
-                                            }
-
-                                            if (data[j].DOZVOLA == 1) {
-                                                $("#raspored").append(
-                                                    "<tr><td>" + data[j].SAT + " - " + i.toString() + 
-                                                    "</td><td>" + data[j].IME_KOLEGIJA +
-                                                    "</td><td>" + data[j].PREDAVAC +
-                                                    "</td><td>" + "<input type='button' name='ponisti' value='poništi rezervaciju'>" +
-                                                    "</td></tr>");
-                                            }
-
-                                            else {
-                                                $("#raspored").append(
-                                                    "<tr><td>" + data[j].SAT + " - " + i.toString() + 
-                                                    "</td><td>" + data[j].IME_KOLEGIJA +
-                                                    "</td><td>" + data[j].PREDAVAC +
-                                                    "</td><td>" + " " +
-                                                    "</td></tr>");
-                                            }
-                                            
-                                            j += ponovi;
-                                            ponovi = 0;
-                                        }
-
-                                        else {                                                                                
-                                            $("#raspored").append(
-                                                "<tr><td>" + i + " - " + (i+1) + 
-                                                "</td><td>" + "<textarea name='kolegij' placeholder='Kolegij..'></textarea>"+
-                                                "</td><td>" + "<textarea name='predavac' placeholder='Predavač..'></textarea>"+
-                                                "</td><td>" + "<input type='button' name='rezerviraj' value='rezerviraj'>"+
-                                                "</td></tr>");
-                                            i++;
-                                        }
-                                    } // kraj while-petlje
-              
-                                    document.getElementById("raspored").style.visibility = "visible";
-                                    
-                                    // rezervacija poredavaonice
-                                    var rez = document.getElementsByName("rezerviraj");
-                                    for (var i = 0; i < rez.length; ++i) {
-                                        rez[i].onclick = function(event) {
-                                            var td = event.target.parentNode;
-                                            var tr = td.parentNode;
-                                            var td1 = tr.children[0]; 
-                                            var td2 = tr.children[1]; 
-                                            var td3 = tr.children[2];
-                                            var _sat = td1.innerHTML;
-                                            _sat = _sat.substring(0, _sat.indexOf(' '));
-                                            var _kolegij = td2.children[0].value;
-                                            var _predavac = td3.children[0].value;
-
-                                            var fil_rez = {
-                                                datum: date,
-                                                predavaonica: room,
-                                                sat: _sat,
-                                                kolegij: _kolegij,
-                                                predavac: _predavac,
-                                            };
-
-                                            $.ajax("rezerviraj.php", {
-                                                type: "POST",
-                                                contentType: "application/json",
-                                                data: JSON.stringify(fil_rez),
-                                                success: function(data) {
-                                                    if (typeof(data) === "string") {
-                                                        alert("Greška: " + data);
-                                                        return;
-                                                    }
-                                                    $("#tekst").text("Raspored predavaonice " + room + " za " + date);
-                                                    $("#raspored").text("");
-                                                    $("#raspored").append(
-                                                        "<tr><th>SAT</th>" +
-                                                        "<th>IME KOLEGIJA</th>" +
-                                                        "<th>PREDAVAČ</th>" +
-                                                        "<th>Radnja</th></tr>");
-                                                    var i = 8, j = 0;
-                                                    var ponovi = 0;
-                                                    while (i < 20) {
-                                                        // i je number, a data[j].sat je string
-                                                        if (j < data.length && data[j].SAT === i.toString()) { 
-                                                            var pamti = data[j].IME_KOLEGIJA;
-                                                            while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
-                                                                ponovi++;
-                                                                i++;
-                                                            }
-
-                                                            if (data[j].DOZVOLA == 1) {
-                                                                $("#raspored").append(
-                                                                    "<tr><td>" + data[j].SAT + " - " + i.toString() + 
-                                                                    "</td><td>" + data[j].IME_KOLEGIJA +
-                                                                    "</td><td>" + data[j].PREDAVAC +
-                                                                    "</td><td>" + "<input type='button' name='ponisti' value='poništi rezervaciju'>" +
-                                                                    "</td></tr>");
-                                                            }
-
-                                                            else {
-                                                                $("#raspored").append(
-                                                                    "<tr><td>" + data[j].SAT + " - " + i.toString() + 
-                                                                    "</td><td>" + data[j].IME_KOLEGIJA +
-                                                                    "</td><td>" + data[j].PREDAVAC +
-                                                                    "</td><td>" + " " +
-                                                                    "</td></tr>");
-                                                            }
-                                                            
-                                                            j += ponovi;
-                                                            ponovi = 0;
-
-                                                        }
-
-                                                        else {                                                                                
-                                                            $("#raspored").append(
-                                                                "<tr><td>" + i + " - " + (i+1) + 
-                                                                "</td><td>" + "<textarea name='kolegij' placeholder='Kolegij..'></textarea>"+
-                                                                "</td><td>" + "<textarea name='predavac' placeholder='Predavač..'></textarea>"+
-                                                                "</td><td>" + "<input type='button' name='rezerviraj' value='rezerviraj'>"+
-                                                                "</td></tr>"); 
-                                                            i++;
-                                                        }
-                                                    } // kraj while petlje kod ajax-a za rezervaciju       
-                                                } // kraj success-funkcije kod ajax-a za rezervaciju
-                                            }); // kraj ajax-a za rezervaciju
-                                        } // kraj onclick-funkcije kod rezervacije
-                                    } // kraj for-petlje kod rezervacije
-                                    
-                                    // poništavanje rezervacije predavaonice
-                                    var pon = document.getElementsByName("ponisti");
-                                    for (var i = 0; i < pon.length; ++i) {
-                                        pon[i].onclick = function(event) {
-                                            var td = event.target.parentNode;
-                                            var tr = td.parentNode;
-                                            var td1 = tr.children[0]; 
-                                            var td2 = tr.children[1]; 
-                                            var td3 = tr.children[2];
-                                            var _sat = td1.innerHTML;
-                                            _sat = _sat.substring(0, _sat.indexOf(' '));
-                                            var _kolegij = td2.innerHTML;
-                                            var _predavac = td3.innerHTML;
-                                            
-                                            var fil_pon = {
-                                                datum: date,
-                                                predavaonica: room,
-                                                sat: _sat,
-                                                kolegij: _kolegij,
-                                                predavac: _predavac,
-                                            };
-
-                                            $.ajax("ponisti.php", {
-                                                type: "POST",
-                                                contentType: "application/json",
-                                                data: JSON.stringify(fil_pon),
-                                                success: function(data) {
-                                                    // alert(data);
-                                                    if (typeof(data) === "string") {
-                                                        alert("Greška u dohvacanju podataka...");
-                                                        return;
-                                                    }
-                                                    $("#tekst").text("Raspored predavaonice " + room + " za " + date);
-                                                    $("#raspored").text("");
-                                                    $("#raspored").append(
-                                                        "<tr><th>SAT</th>" +
-                                                        "<th>IME KOLEGIJA</th>" +
-                                                        "<th>PREDAVAČ</th>" +
-                                                        "<th>Radnja</th></tr>");
-                                                    var i = 8, j = 0;
-                                                    var ponovi = 0;
-                                                    while (i < 20) {
-                                                        // i je number, a data[j].sat je string
-                                                        if (j < data.length && data[j].SAT === i.toString()) { 
-                                                            var pamti = data[j].IME_KOLEGIJA;
-                                                            while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
-                                                                ponovi++;
-                                                                i++;
-                                                            }
-
-                                                            if (data[j].DOZVOLA == 1) {
-                                                                $("#raspored").append(
-                                                                    "<tr><td>" + data[j].SAT + " - " + i.toString() + 
-                                                                    "</td><td>" + data[j].IME_KOLEGIJA +
-                                                                    "</td><td>" + data[j].PREDAVAC +
-                                                                    "</td><td>" + "<input type='button' name='ponisti' value='poništi rezervaciju'>" +
-                                                                    "</td></tr>");
-                                                            }
-
-                                                            else {
-                                                                $("#raspored").append(
-                                                                    "<tr><td>" + data[j].SAT + " - " + i.toString() + 
-                                                                    "</td><td>" + data[j].IME_KOLEGIJA +
-                                                                    "</td><td>" + data[j].PREDAVAC +
-                                                                    "</td><td>" + " " +
-                                                                    "</td></tr>");
-                                                            }
-                                                            
-                                                            j += ponovi;
-                                                            ponovi = 0;
-
-                                                        }
-
-                                                        else {                                                                                
-                                                            $("#raspored").append(
-                                                                "<tr><td>" + i + " - " + (i+1) + 
-                                                                "</td><td>" + "<textarea name='kolegij' placeholder='Kolegij..'></textarea>"+
-                                                                "</td><td>" + "<textarea name='predavac' placeholder='Predavač..'></textarea>"+
-                                                                "</td><td>" + "<input type='button' name='rezerviraj' value='rezerviraj'>"+
-                                                                "</td></tr>"); 
-                                                            i++;
-                                                        }
-                                                    } // kraj while petlje kod ajax-a za poništavanje
-                                                } // kraj success-funkcije kod ajax-a za poništavanje
-                                            }); // kraj ajax-a za poništavanje
-                                        } // kraj onclick-funkcije kod poništavanja
-                                    } // kraj for-petlje kod poništavanja
-                                } // kraj success-funkcije kod ajax-a za raspored
-                            }); // kraj ajaxa za raspored
-                        }; // kraj onclick-funkcije za td-ove 
-                    } // kraj for-petlje po td-ovima
+                	klik();
                 }); // kraj globalObject-funkcije
             }); // kraj documentReady-funkcije
+
+
         </script>
         <?php
     } 
