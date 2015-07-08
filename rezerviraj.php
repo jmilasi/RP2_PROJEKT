@@ -10,17 +10,22 @@ $sat = $filter["sat"];
 $kolegij = $filter["kolegij"];
 $predavac = $filter["predavac"];
 $dan_u_tj = dan_u_tjednu($datum);
-if(isset($_SESSION["admin"]))
+
+if (isset($_SESSION["admin"]))
 	$admin = $_SESSION["admin"];
-if ($predavac != $_SESSION["tko"] && $admin == 0 ) {
-	$ret = "Ne možete rezervirati termin koji nije na Vaše ime!";
-	header("Content-Type: application/json");
-	echo json_encode($ret);
-	return false;
-}
 
 if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica) &&
 	isset($kolegij) && isset($predavac) && isset($dan_u_tj)) {
+
+	if ($predavaonica === "" || $kolegij === "") {
+		echo "Nešto je ostalo nepopunjeno!";
+		return false;
+	}
+
+	if ($predavac != $_SESSION["tko"] && $admin == 0) {
+		echo "Ne možete rezervirati termin koji nije na Vaše ime!";
+		return false;
+	}
 
 	$st = DB::get()->prepare("INSERT INTO REZERVACIJE VALUES (:predavaonica, :datum, :sat, :predavac, :kolegij, 1)");
 
@@ -68,8 +73,8 @@ if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica) &&
 
 	if (isset($tko)) {
 		for ($i = 0; $i < sizeof($ret); ++$i) {
-			if ($ret[$i]['DOZVOLA'] == 1 && $ret[$i]['PREDAVAC'] != $tko)
-				$ret[$i]['DOZVOLA'] = 0;
+			if ($ret[$i]["DOZVOLA"] == 1 && $ret[$i]["PREDAVAC"] != $tko)
+				$ret[$i]["DOZVOLA"] = 0;
 		}
 	}
 

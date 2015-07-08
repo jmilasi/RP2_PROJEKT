@@ -11,10 +11,11 @@ $dan_u_tj = dan_u_tjednu($datum);
 if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica)) {
 	if (isset($_SESSION["tko"]))		
 		$tko = $_SESSION["tko"];
-	if(isset($_SESSION["admin"]))
+	if (isset($_SESSION["admin"]))
 		$admin = $_SESSION["admin"];
 	else
 		$admin = 0;
+
 	// prvo treba provjeriti radi li već netko s odabranim datumom i odabranom predavonicom
 	$st = DB::get()->prepare(
 		"SELECT PREDAVAONICA, DATUM FROM OBRADA WHERE PREDAVAONICA = :predavaonica AND DATUM = :datum");
@@ -36,7 +37,7 @@ if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica)) {
 	// ako postoji netko tko već radi, onda javi da je zauzeto
 	$row = $st->fetch();
 	if ($row["PREDAVAONICA"] == $predavaonica && $row["DATUM"] == $datum) {
-		$ret = "zauzeto";
+		$ret = "Zauzeto!\nNetko upravo mijenja podatke za odabrani datum i predavaonicu.";
 		header("Content-Type: application/json");
 		echo json_encode($ret);
 		return;

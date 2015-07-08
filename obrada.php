@@ -13,8 +13,6 @@ if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica)) {
 	$error = DB::get()->errorInfo();
 	if (isset($error[2])) {
 		echo "DB::get()->prepare error: " . $error[2];
-		$ret = "nije_ok";
-		echo json_encode($ret);
 		return false;
 	}
 
@@ -25,8 +23,6 @@ if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica)) {
 	$error = $st->errorInfo();
 	if (isset($error[2])) {	
 		echo "$st->execute error: " . $error[2];
-		$ret = "nije_ok";
-		echo json_encode($ret);
 		return false;
 	}
 
