@@ -11,6 +11,14 @@ $kolegij = $filter["kolegij"];
 $predavac = $filter["predavac"];
 $dan_u_tj = dan_u_tjednu($datum);
 
+if (isset($_SESSION["tko"]))
+	$tko = $_SESSION["tko"];
+
+if (isset($_SESSION["admin"]))
+	$admin = $_SESSION["admin"];
+else
+	$admin = 0; // možda je nepotrebno, no radi sigurnosti je bolje
+
 if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica) &&
 	isset($kolegij) && isset($predavac) && isset($dan_u_tj)) {
 
@@ -56,7 +64,7 @@ if (isset($datum) && isset($predavaonica) && ctype_alnum($predavaonica) &&
 	while ($row = $st->fetch())
 		$ret[] = $row;
 
-	if (isset($tko)) {
+	if (isset($tko) && $admin == 0) {
 		for ($i = 0; $i < sizeof($ret); ++$i) {
 			if ($ret[$i]["DOZVOLA"] == 1 && $ret[$i]["PREDAVAC"] != $tko)
 				$ret[$i]["DOZVOLA"] = 0;

@@ -26,13 +26,13 @@ if (isset($username) && isset($_POST["logout"])) {
 <html lang="hr">
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Rezervacija</title>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="css/stil.css" />
     <link rel="stylesheet" type="text/css" media="all" href="jsDatePick_ltr.min.css" />
     <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
-    <script src="jquery-2.1.4.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/stil.css" />
+    <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
 </head>
 
 <body>
@@ -65,11 +65,47 @@ if (isset($username)) {
     <script type="text/javascript">
         $(document).ready(function() {
             var date, room;
-            var pred = "<table id='sobe'>" +
-                    "<tr><td>001</td><td>002</td><td>003</td></tr>" +
-                    "<tr><td>004</td><td>005</td><td>006</td></tr>" +
-                    "<tr><td>110</td><td>201</td><td>A101</td></tr>" +
-                    "</table>";
+            var pred = "";
+
+			function ispisi_pred(podatci) {
+				pred += "<table id = sobe>";
+				var i, j = 0;
+				
+				while (j < podatci.length) {
+					pred += "<tr>";
+					for (i = 0 ; i < 3 ; i++) {
+						if (j >= podatci.length) {
+							pred += "<td></td>";
+						}
+						else {
+							pred += "<td>" + podatci[j].BROJ + "</td>";
+							j++;
+						}
+					}
+					pred += "</tr>";
+				}
+				pred += "</table>";
+			}
+
+			var fill_pred = "";
+
+			$.ajax("predavaonice.php", {
+				type: "POST",
+				contentType: "application/json",
+				data: JSON.stringify(fill_pred),
+				success: function(data) {
+					if (typeof(data) === "string") {
+						alert(data);
+						return;
+					}
+					else {
+						ispisi_pred(data);
+					}
+				}
+			});
+
+			var admin = <?php echo json_encode($_SESSION["admin"]); ?>;
+			var ime_predavaca = <?php echo json_encode($_SESSION["tko"]); ?>;
 
             globalObject = new JsDatePick({
                 useMode: 1,
@@ -93,7 +129,8 @@ if (isset($username)) {
 					// i je number, a data[j].sat je string
 					if (j < data.length && data[j].SAT === i.toString()) { 
 						var pamti = data[j].IME_KOLEGIJA;
-						while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
+						var tmp_predavac = data[j].PREDAVAC;
+						while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA && tmp_predavac == data[j+ponovi].PREDAVAC) {
 							ponovi++;
 							i++;
 						}
@@ -103,7 +140,7 @@ if (isset($username)) {
 								"<tr><td>" + data[j].SAT + " - " + i.toString() + 
 								"</td><td>" + data[j].IME_KOLEGIJA +
 								"</td><td>" + data[j].PREDAVAC +
-								"</td><td>" + "<input type='button' name='ponisti' value='poništi rezervaciju'>" +
+								"</td><td>" + "<input class='izmjene' name='ponisti' type='button' value='Poništi' />" +
 								"</td></tr>");
 						}
 
@@ -112,7 +149,7 @@ if (isset($username)) {
 								"<tr><td>" + data[j].SAT + " - " + i.toString() + 
 								"</td><td>" + data[j].IME_KOLEGIJA +
 								"</td><td>" + data[j].PREDAVAC +
-								"</td><td>" + " " +
+								"</td><td>" + "(ništa)" +
 								"</td></tr>");
 						}
 
@@ -120,20 +157,30 @@ if (isset($username)) {
 						ponovi = 0;
 					}
 
-					else {                                                                                
-						$("#raspored").append(
-							"<tr><td>" + i + " - " + (i+1) + 
-							"</td><td>" + "<textarea name='kolegij' placeholder='Kolegij..'></textarea>"+
-							"</td><td>" + "<textarea name='predavac' placeholder='Predavač..'></textarea>"+
-							"</td><td>" + "<input type='button' name='rezerviraj' value='rezerviraj'>"+
-							"</td></tr>"); 
+					else {
+						if (admin == '1') {
+							$("#raspored").append(
+								"<tr><td>" + i + " - " + (i+1) + 
+								"</td><td>" + "<input class='izmjene' name='kolegij' type='text' placeholder='prostor za unos' />"+
+								"</td><td>" + "<input class='izmjene' name='predavac' type='text' placeholder='prostor za unos' />"+
+								"</td><td>" + "<input class='izmjene' name='rezerviraj' type='button' value='Rezerviraj' />"+
+								"</td></tr>");
+						}
+						else {
+							$("#raspored").append(
+								"<tr><td>" + i + " - " + (i+1) + 
+								"</td><td>" + "<input class='izmjene' name='kolegij' type='text' placeholder='prostor za unos' />"+
+								"</td><td>" + "<input class='izmjene' name='predavac' type='text' value='" + ime_predavaca + "' />" +
+								"</td><td>" + "<input class='izmjene' name='rezerviraj' type='button' value='Rezerviraj' />"+
+								"</td></tr>");							
+						}
 						
 						i++;
 					}
-
-					document.getElementById("raspored").style.visibility = "visible";
 				} // kraj while-petlje
 
+				document.getElementById("raspored").style.visibility = "visible";
+				
 				// rezervacija predavaonice
 				var rez = document.getElementsByName("rezerviraj");
 				for (var i = 0; i < rez.length; ++i) {
@@ -241,6 +288,8 @@ if (isset($username)) {
 
 				tds = document.getElementsByTagName("td");
 				for (var i = 0; i < tds.length; ++i) {
+					if (tds[i].innerHTML === "")
+						continue;
 					tds[i].onclick = function() {
 						room = this.innerHTML;    
 						document.getElementById("povratak").style.visibility = "visible";                 
@@ -283,8 +332,14 @@ if (isset($username)) {
 				window.addEventListener("beforeunload", function() {
 					obrada(date, room);
 				}, false);
-				window.addEventListener("logout", function() {
-						obrada(date, room);
+				window.addEventListener("unload", function() {
+					obrada(date, room);
+				}, false);
+				window.addEventListener("popstate", function() {
+  					obrada(data, room);	
+				}, false);
+				window.addEventListener("hashchange", function(){
+					obrada(data, room);
 				}, false);
 			}); // kraj globalObject-a
 		}); // kraj documentReady-funkcije
@@ -314,7 +369,7 @@ else { ?>
 <script>
 	var pogledaj = document.getElementById("pogledaj");
 	pogledaj.onclick = function(){
-		window.location.href = "http://192.168.89.245/~iposavc/projekt/samo_pregledaj.php";
+		window.location.href = "http://192.168.89.245/~iposavc/projekt/samo_pregledaj.html";
 	}
 </script>
 </body>
