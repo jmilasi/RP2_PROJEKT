@@ -25,7 +25,6 @@ if (isset($username) && isset($_POST["logout"])) {
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Rezervacija</title>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -68,22 +67,22 @@ if (isset($username)) {
             var pred = "";
 
 			function ispisi_pred(podatci) {
-				pred += "<table id = sobe>";
-				var i, j = 0;
+				pred += "<table id=sobe>";
+				var koliko = 0;
 				
-				while (j < podatci.length) {
+				while (koliko < podatci.length) {
 					pred += "<tr>";
-					for (i = 0 ; i < 3 ; i++) {
-						if (j >= podatci.length) {
+					for (var j = 0; j < 3; ++j) {
+						if (koliko < podatci.length)
+							pred += "<td>" + podatci[koliko].BROJ + "</td>";
+						else
 							pred += "<td></td>";
-						}
-						else {
-							pred += "<td>" + podatci[j].BROJ + "</td>";
-							j++;
-						}
+
+						++koliko;
 					}
-					pred += "</tr>";
+					pred += "<tr/>";
 				}
+				
 				pred += "</table>";
 			}
 
