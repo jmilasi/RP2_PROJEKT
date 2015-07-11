@@ -2,19 +2,40 @@
 <html lang="hr">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Rezervacija</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
-	<link rel="stylesheet" type="text/css" href="css/stil.css" />
-	<link rel="stylesheet" type="text/css" media="all" href="jsDatePick_ltr.min.css" />
+	<title>Pregled rasporeda</title>
+    <link rel="stylesheet" type="text/css" href="css/stil.css" />
+    <link rel="stylesheet" type="text/css" href="css/login_form_style.css">
+    <link rel="stylesheet" type="text/css" media="all" href="css/jsDatePick_ltr.min.css" />
 	<script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
 	<script type="text/javascript" src="jquery-2.1.4.min.js"></script>
 </head>
 
 <body>
-	<div id="calendar"></div>
-	<div id="predavaonice" align="center"></div>
-	<h2 id="tekst" align="center"></h2>
-	<table id="raspored" align="center" style="visibility: hidden"></table>
+    <div class="content">
+        <span id="natpis">Gost</span>
+        <form id="odjava" method="POST" action="login.php">
+            <input type="hidden" name="logout" />
+            <input type="submit" class="myButton" value="Izađi" />
+        </form>
+        <h1 align="center">Rezervacija prostorija na PMF-MO</h1>
+        <div id="prikaz_kalendara">
+        	<span id="najava_kalendara">Kliknite na željeni datum iz kalendara!</span>
+        	<div id="calendar"></div>
+        </div>
+        <div id="prikaz_predavaonice">
+        	<span id="najava_predavaonice"><em>Nakon toga</em> kliknite na željenu predavaonicu!</span>
+	        <div id="predavaonice"></div>
+        </div>
+        <div id="tablica" align="center">
+            <h2 id="tekst"></h2>
+			<input type="button" class="myButton" id="natrag" value="Natrag" />
+            <table id="raspored"></table>
+        </div>
+    </div>
+    <div class="footer">
+        J. Milašinović, M. Pavlović, I. Posavčević<br />
+        <a href="http://web.math.pmf.unizg.hr/nastava/rp2d/">RP2</a>, <a href="https://www.math.pmf.unizg.hr/">PMF-MO</a>, 2015.
+    </div>
 
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -39,6 +60,8 @@
 				}
 				
 				pred += "</table>";
+				var predavaonice = document.getElementById("predavaonice");
+				predavaonice.innerHTML = pred; // tablica predavaonica
 			}
 
 			var fill_pred = "";
@@ -76,57 +99,61 @@
 				var i = 8, j = 0;
 				var ponovi = 0;
 				
-			while (i < 20) {
-				// i je number, a data[j].sat je string
-				if (j < data.length && data[j].SAT === i.toString()) { 
-					var pamti = data[j].IME_KOLEGIJA;
-					while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
-						ponovi++;
-						i++;
+				while (i < 20) {
+					// i je number, a data[j].sat je string
+					if (j < data.length && data[j].SAT === i.toString()) { 
+						var pamti = data[j].IME_KOLEGIJA;
+						while (j+ponovi < data.length && pamti == data[j+ponovi].IME_KOLEGIJA) {
+							ponovi++;
+							i++;
+						}
+
+					$("#raspored").append(
+						"<tr><td>" + data[j].SAT + " - " + i.toString() + 
+						"</td><td>" + data[j].IME_KOLEGIJA +
+						"</td><td>" + data[j].PREDAVAC +
+						"</td></tr>");
+						
+						j += ponovi;
+						ponovi = 0;
 					}
 
-				$("#raspored").append(
-					"<tr><td>" + data[j].SAT + " - " + i.toString() + 
-					"</td><td>" + data[j].IME_KOLEGIJA +
-					"</td><td>" + data[j].PREDAVAC +
-					"</td></tr>");
-					
-					j += ponovi;
-					ponovi = 0;
-				}
+					else {                                                                                
+						$("#raspored").append(
+							"<tr><td>" + i + " - " + (i+1) + 
+							"</td><td>" + ""+
+							"</td><td>" + ""+
+							"</td></tr>"); 
+						
+						i++;
+					}
+				} // kraj while-petlje
 
-				else {                                                                                
-					$("#raspored").append(
-						"<tr><td>" + i + " - " + (i+1) + 
-						"</td><td>" + ""+
-						"</td><td>" + ""+
-						"</td></tr>"); 
-					
-					i++;
-				}
-			} // kraj while-petlje
-
-			document.getElementById("raspored").style.visibility = "visible";
+				document.getElementById("raspored").style.visibility = "visible";
 			} // kraj funkcije ispis()
 
 			function klik() {
-				$("#raspored").text(""); // obriši raspored prilikom klika na datum
-				$("#tekst").text(""); // obriši što piše
-
 				var obj = globalObject.getSelectedDay();
 				date = obj.day + "." + obj.month + "." + obj.year + ".";
-
-				var predavaonice = document.getElementById("predavaonice");
-				predavaonice.innerHTML = pred; // tablica predavaonica      
 
 				tds = document.getElementsByTagName("td");
 				for (var i = 0; i < tds.length; ++i) {
 					if (tds[i].innerHTML == "")
 						continue;
 					tds[i].onclick = function() {
-						room = this.innerHTML;    
+						room = this.innerHTML;
+						document.getElementById("tablica").style.display = "block";
+						document.getElementById("natrag").onclick = function() {
+							document.getElementById("tablica").style.display = "none";
+							document.getElementById("prikaz_kalendara").style.display = "inline-block";
+							document.getElementById("prikaz_predavaonice").style.display = "inline-block";							
+							return;
+						}
+
 						var fil = {datum: date, predavaonica: room};
-						document.getElementById("sobe").remove(); // obriši listu predavaonica prilikom klika na nju							
+						document.getElementById("prikaz_kalendara").style.display = "none";
+						document.getElementById("prikaz_predavaonice").style.display = "none";
+
 						$.ajax("samo_pregledaj.php", {
 							type: "POST",
 							contentType: "application/json",
@@ -134,6 +161,9 @@
 							success: function(data) {
 								if (typeof(data) === "string") {
 									alert(data);
+									document.getElementById("tablica").style.display = "none";
+									document.getElementById("prikaz_kalendara").style.display = "inline-block";
+									document.getElementById("prikaz_predavaonice").style.display = "inline-block";									
 									return;
 								}
 								else {

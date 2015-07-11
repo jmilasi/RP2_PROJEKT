@@ -27,9 +27,9 @@ if (isset($username) && isset($_POST["logout"])) {
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Rezervacija</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/stil.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="jsDatePick_ltr.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/login_form_style.css">
+    <link rel="stylesheet" type="text/css" media="all" href="css/jsDatePick_ltr.min.css" />
     <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
     <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
 </head>
@@ -48,21 +48,37 @@ if (isset($username)) {
 	$tko = $st->fetch();
 	$_SESSION["tko"] = $tko["PREDAVAC"];
 	$_SESSION["admin"] = $tko["ADMIN"];
-	echo "Korisnik: " . $_SESSION["tko"]. "<br />"; ?>
+?>
 
-	<form method="POST" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>">
-		<input type="hidden" name="logout" />
-		<input type="submit" value="Log Out" />
-	</form>
-
-	<input type="button" id="povratak" value="povratak" style="visibility: hidden" />
-	<div id="calendar"></div>
-	<div id="predavaonice" align="center"></div>
-	<h2 id="tekst" align="center"></h2>
-	<table id="raspored" align="center" style="visibility: hidden"></table>
+    <div class="content">
+        <span id="natpis"></span>
+        <form id="odjava" method="POST" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="logout" />
+            <input type="submit" class="myButton" value="Odjava" />
+        </form>
+        <h1 align="center">Rezerviranje predavaonica i pregled rasporeda</h1>
+        <div id="prikaz_kalendara">
+        	<span id="najava_kalendara">Kliknite na željeni datum iz kalendara!</span>
+        	<div id="calendar"></div>
+        </div>
+        <div id="prikaz_predavaonice">
+        	<span id="najava_predavaonice"><em>Nakon toga</em> kliknite na željenu predavaonicu!</span>
+	        <div id="predavaonice"></div>
+        </div>
+        <div id="tablica" align="center">
+            <h2 id="tekst"></h2>
+			<input type="button" class="myButton" id="natrag" value="Natrag" />
+            <table id="raspored"></table>
+        </div>
+    </div>
+    <div class="footer">
+        J. Milašinović, M. Pavlović, I. Posavčević<br />
+        <a href="http://web.math.pmf.unizg.hr/nastava/rp2d/">RP2</a>, <a href="https://www.math.pmf.unizg.hr/">PMF-MO</a>, 2015.
+    </div>
 
     <script type="text/javascript">
         $(document).ready(function() {
+            document.getElementById("natpis").innerHTML = <?php echo json_encode($_SESSION["tko"]); ?>;
             var date, room;
             var pred = "";
 
@@ -84,6 +100,8 @@ if (isset($username)) {
 				}
 				
 				pred += "</table>";
+				var predavaonice = document.getElementById("predavaonice");
+				predavaonice.innerHTML = pred; // tablica predavaonica
 			}
 
 			var fill_pred = "";
@@ -178,7 +196,7 @@ if (isset($username)) {
 					}
 				} // kraj while-petlje
 
-				document.getElementById("raspored").style.visibility = "visible";
+				document.getElementById("tablica").style.display = "block";
 				
 				// rezervacija predavaonice
 				var rez = document.getElementsByName("rezerviraj");
@@ -276,35 +294,28 @@ if (isset($username)) {
 			} // kraj funkcije obrada()
 
 			function klik() {
-				$("#raspored").text(""); // obriši raspored prilikom klika na datum
-				$("#tekst").text(""); // obriši što piše
-
 				var obj = globalObject.getSelectedDay();
 				date = obj.day + "." + obj.month + "." + obj.year + ".";
 
-				var predavaonice = document.getElementById("predavaonice");
-				predavaonice.innerHTML = pred; // tablica predavaonica      
-
 				tds = document.getElementsByTagName("td");
 				for (var i = 0; i < tds.length; ++i) {
-					if (tds[i].innerHTML === "")
+					if (tds[i].innerHTML == "")
 						continue;
 					tds[i].onclick = function() {
-						room = this.innerHTML;    
-						document.getElementById("povratak").style.visibility = "visible";                 
-						document.getElementById("povratak").onclick = function() {
+						room = this.innerHTML;
+						document.getElementById("tablica").style.display = "block";
+						document.getElementById("natrag").onclick = function() {
 							obrada(date, room);
-							document.getElementById("povratak").style.visibility = "hidden";
-							$("#raspored").text(""); // obriši raspored prilikom klika na datum
-							$("#tekst").text(""); // obriši što piše
-							document.getElementById("calendar").style.visibility = "visible";
+							document.getElementById("tablica").style.display = "none";
+							document.getElementById("prikaz_kalendara").style.display = "inline-block";
+							document.getElementById("prikaz_predavaonice").style.display = "inline-block";							
 							return;
 						}
 
 						var fil = {datum: date, predavaonica: room};
-						document.getElementById("sobe").remove(); // obriši listu predavaonica prilikom klika na nju
-						document.getElementById("calendar").style.visibility = "hidden";
-						
+						document.getElementById("prikaz_kalendara").style.display = "none";
+						document.getElementById("prikaz_predavaonice").style.display = "none";
+
 						$.ajax("raspored.php", {
 							type: "POST",
 							contentType: "application/json",
@@ -312,8 +323,9 @@ if (isset($username)) {
 							success: function(data) {
 								if (typeof(data) === "string") {
 									alert(data);
-									document.getElementById("povratak").style.visibility = "hidden";
-									document.getElementById("calendar").style.visibility = "visible";
+									document.getElementById("tablica").style.display = "none";
+									document.getElementById("prikaz_kalendara").style.display = "inline-block";
+									document.getElementById("prikaz_predavaonice").style.display = "inline-block";
 									return;
 								}
 								else {
@@ -347,29 +359,23 @@ if (isset($username)) {
 } 
 
 else { ?>
-	<div class="info">
-		<h1>Aplikacija</h1>
+	<div class="content">
+		<h1 align="center">Aplikacija za rezerviranje predavaonica</h1>
+	    <form class="login" method="post" action="login.php">
+	        <h3>Podatci za prijavu</h3>
+	        <input class="login-input" type="text" name="username" placeholder="Korisničko ime" autofocus />
+	        <input class="login-input" type="password" name="password" placeholder="Lozinka" />
+	        <input class="login-submit" type="submit" value="Prijava" />
+	        <p class="login-help"><a href="http://192.168.89.245/~iposavc/projekt/samo_pregledaj.html">Za neregistrirane korisnike</a></p>
+	    </form>
 	</div>
-	<div class="form aniamted bounceIn">
-		<div class="login">
-			<h2>Podatci za prijavu</h2>
-			<form method="post" action="login.php">
-				<input placeholder="Username" type="text", name="username" />
-				<input placeholder="Password" type="password", name="password" />
-				<button type="submit">Prijava</button>
-			</form>
-			<button id="pogledaj">Pogledaj raspored</button>
-		</div>
-	</div>
+    <div class="footer">
+        J. Milašinović, M. Pavlović, I. Posavčević<br />
+        <a href="http://web.math.pmf.unizg.hr/nastava/rp2d/">RP2</a>, <a href="https://www.math.pmf.unizg.hr/">PMF-MO</a>, 2015.
+    </div>
 	<?php
 }
 ?>
 
-<script>
-	var pogledaj = document.getElementById("pogledaj");
-	pogledaj.onclick = function(){
-		window.location.href = "http://192.168.89.245/~iposavc/projekt/samo_pregledaj.html";
-	}
-</script>
 </body>
 </html>

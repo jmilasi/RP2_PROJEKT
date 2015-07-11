@@ -16,7 +16,7 @@
 	line-height: 15px;
 	font-size: 10px;
 	overflow: hidden;
-	background: white;
+	background: #FAFAFA;
 	color: black;
 	text-align: center;
 	margin: 4px 2px 8px 2px;
@@ -33,7 +33,7 @@
 
 .JsDatePickBox .weekDaysRow .weekDay { /* naziv nekoga dana u tjednu */
 	float: left;
-	background-color: blue;
+	background-color: #0B0B61;
 	overflow: hidden;
 	width: 65px;
 	margin: 0 3px 0 2.5px;
@@ -43,10 +43,13 @@
 }
 
 .JsDatePickBox .boxMainInner { /* unutrašnjost kalendara */
-	background: #F7FE2E;
+	background: #A9D0F5;
 	float: left;
 	padding: 10px 3px 0px 3px;
 	height: 340px;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
 }
 
 .JsDatePickBox .boxMainInner .controlsBar { /* prostor za ispis mjeseca i godine */
@@ -166,8 +169,9 @@
 
 .JsDatePickBox .boxMainInner .dayNormalToday {
 	cursor: pointer;
-	color: blue;
+	color: black;
 	font-weight: bold;
+	text-decoration: underline;
 }
 
 .JsDatePickBox .boxMainInner .dayDisabled {
@@ -177,27 +181,21 @@
 
 .JsDatePickBox .boxMainInner .dayOver {
 	cursor: pointer;
-	background: blue;
+	background: #0B0B61;
 	color: white;
 }
 
-.JsDatePickBox .boxMainInner .dayOverToday {
+.JsDatePickBox .boxMainInner .dayOverToday, .dayDownToday {
 	cursor: pointer;
-	background: blue;
+	background: #0B0B61;
 	color: white;
 	font-weight: bold;
+	text-decoration: underline;
 }
 
 .JsDatePickBox .boxMainInner .dayDown {
 	cursor: pointer;
-	background: blue;
-	color: white;
-	font-weight: bold;
-}
-
-.JsDatePickBox .boxMainInner .dayDownToday {
-	cursor: pointer;
-	background: blue;
+	background: #0B0B61;
 	color: white;
 	font-weight: bold;
 }

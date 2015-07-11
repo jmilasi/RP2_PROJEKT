@@ -1,15 +1,122 @@
-body {
+html, body {
     font-family: Helvetica, Arial, sans-serif;
-    background-color: white;
+    background: url(938-white-background-wallpaper-2048x1152.jpg);
+    height: 100%;
+}
+
+.myButton {
+    background-color: #FAFAFA;
+    font-size: 15px;
+	color: #08088A;
+}
+
+.myButton:hover {
+	cursor: pointer;
+    background-color: #E6E6E6;
+}
+
+em {
+    font-weight: bold;
+    font-style: normal;
+    text-decoration: underline;
+}
+
+a {
+    color: #6E6E6E;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #0B0B61;
+}
+
+.content { 
+	border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+	margin: 20px 200px 10px 200px;
+	position: relative;
+	height: auto !important;
+	min-height: 85%;
+}
+
+.footer {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+	margin: 10px 200px 10px 200px;
+	padding: 10px 0 10px 0;
+	text-align: center;
+}
+
+#natpis {
+	display: inline-block;
+	margin: 10px 0 0 50px;
+	padding: 0 5px 0 5px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    background-color: #FAFAFA;
+	font-variant: small-caps;
+}
+
+#odjava {
+	float: right;
+	display: inline-block;
+	margin: 10px 50px 0 0;
+}
+
+.content h1 {
+    font-size: 25px;
+	text-transform: uppercase;
+	margin: 40px 0 60px 0;
+}
+
+#najava_kalendara, #najava_predavaonice {
+	padding: 2px 5px 2px 5px;
+	color: #08088A;
+}
+
+#prikaz_kalendara {
+	display: inline-block;
+	margin-left: 50px;
 }
 
 #calendar {
-    margin: 10px 0 30px 10px;
-    border-width: 2px;
-    border-style: solid;
-    border-color: black;
-    width: 500px;
-    height: 350px;
+    margin: 20px 0 20px 0;
+}
+
+#prikaz_predavaonice {
+	display: inline-block;
+	float: right;
+	margin-right: 50px;
+}
+
+#predavaonice table {
+	border-width: 2px;
+	margin: 20px 0 20px 0;
+	width: 400px;
+}
+
+#predavaonice table td {
+	border-width: 1px;
+	height: 40px;
+}
+
+#tablica {
+	display: none;
+	padding-bottom: 30px;
+}
+
+#tablica h2 {
+	text-decoration: underline;
+	color: #0B0B61;
+	margin: -30px 0 5px 0;
+}
+
+#natrag {
+	margin: 10px 0 15px 0;
+	font-size: 20px;
 }
 
 table {
@@ -46,6 +153,7 @@ td {
 tr td:hover { /* hover effect */
     background: #0B0B61;
     color: white;
+    cursor: pointer;
 }
 
 #raspored tr td:nth-child(1):hover { /* 1st column hover effect */

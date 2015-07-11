@@ -34,7 +34,8 @@ function addUserToDatabase() {
 	}
 
 	else {
-		echo "Korisničko ime smije imati samo slova i znamenke!<br />";
+		$message = "Korisničko ime smije imati samo slova i znamenke!";
+		echo "<script type='text/javascript'>alert('$message');</script>";
 		return false;
 	}
 		
@@ -69,7 +70,8 @@ function verifyLogin() {
 	if (ctype_alnum($_POST["username"]))
 		$username = $_POST["username"];
 	else {
-		echo "Username se smije sastojati samo od slova i znamenki.<br />";
+		$message = "Korisničko ime smije imati samo slova i znamenke!";
+		echo "<script type='text/javascript'>alert('$message');</script>";
 		return false;
 	}
 		
@@ -91,14 +93,16 @@ function verifyLogin() {
 
 	$hashed_password = $st->fetchColumn();
 	if (!$hashed_password) {
-		echo "Taj username ne postoji!<br />";
+		$message = "To korisničko ime ne postoji!";
+		echo "<script type='text/javascript'>alert('$message');</script>";
 		return false;
 	}
 
 	if (password_verify($_POST["password"], $hashed_password)) 
 		return true;
 	else {
-		echo "Password nije ispravan!<br />";
+		$message = "Password nije ispravan!";
+		echo "<script type='text/javascript'>alert('$message');</script>";
 		return false;
 	}
 }
