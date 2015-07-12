@@ -12,17 +12,19 @@
 
 <body>
     <div class="content">
-        <span id="natpis">Gost</span>
-        <form id="odjava" method="POST" action="login.php">
-            <input type="hidden" name="logout" />
-            <input type="submit" class="myButton" value="Izađi" />
-        </form>
+    	<div>
+	        <span id="natpis">Gost</span>
+	        <form id="odjava" method="POST" action="login.php">
+	            <input type="hidden" name="logout" />
+	            <input type="submit" class="myButton" value="Izađi" />
+	        </form>
+        </div>
         <h1 align="center">Rezervacija prostorija na PMF-MO</h1>
-        <div id="prikaz_kalendara">
+        <div id="prikaz_kalendara" align="center">
         	<span id="najava_kalendara">Kliknite na željeni datum iz kalendara!</span>
         	<div id="calendar"></div>
         </div>
-        <div id="prikaz_predavaonice">
+        <div id="prikaz_predavaonice" align="center">
         	<span id="najava_predavaonice"><em>Nakon toga</em> kliknite na željenu predavaonicu!</span>
 	        <div id="predavaonice"></div>
         </div>
@@ -145,8 +147,8 @@
 						document.getElementById("tablica").style.display = "block";
 						document.getElementById("natrag").onclick = function() {
 							document.getElementById("tablica").style.display = "none";
-							document.getElementById("prikaz_kalendara").style.display = "inline-block";
-							document.getElementById("prikaz_predavaonice").style.display = "inline-block";							
+							document.getElementById("prikaz_kalendara").style.display = "block";
+							document.getElementById("prikaz_predavaonice").style.display = "block";							
 							return;
 						}
 
@@ -162,8 +164,8 @@
 								if (typeof(data) === "string") {
 									alert(data);
 									document.getElementById("tablica").style.display = "none";
-									document.getElementById("prikaz_kalendara").style.display = "inline-block";
-									document.getElementById("prikaz_predavaonice").style.display = "inline-block";									
+									document.getElementById("prikaz_kalendara").style.display = "block";
+									document.getElementById("prikaz_predavaonice").style.display = "block";									
 									return;
 								}
 								else {

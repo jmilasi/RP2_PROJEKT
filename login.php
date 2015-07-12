@@ -28,7 +28,7 @@ if (isset($username) && isset($_POST["logout"])) {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Rezervacija</title>
     <link rel="stylesheet" type="text/css" href="css/stil.css" />
-    <link rel="stylesheet" type="text/css" href="css/login_form_style.css">
+    <link rel="stylesheet" type="text/css" href="css/login_form_style.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/jsDatePick_ltr.min.css" />
     <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
     <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
@@ -51,17 +51,20 @@ if (isset($username)) {
 ?>
 
     <div class="content">
-        <span id="natpis"></span>
-        <form id="odjava" method="POST" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>">
-            <input type="hidden" name="logout" />
-            <input type="submit" class="myButton" value="Odjava" />
-        </form>
+    	<div>
+	        <span id="natpis"></span>
+	        <form id="odjava" method="POST" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>">
+	            <input type="hidden" name="logout" />
+	            <input type="submit" class="myButton" value="Odjava" />
+	        </form>
+        </div>
+		<span id="signin"></span>
         <h1 align="center">Rezerviranje predavaonica i pregled rasporeda</h1>
-        <div id="prikaz_kalendara">
+        <div id="prikaz_kalendara" align="center">
         	<span id="najava_kalendara">Kliknite na željeni datum iz kalendara!</span>
         	<div id="calendar"></div>
         </div>
-        <div id="prikaz_predavaonice">
+        <div id="prikaz_predavaonice" align="center">
         	<span id="najava_predavaonice"><em>Nakon toga</em> kliknite na željenu predavaonicu!</span>
 	        <div id="predavaonice"></div>
         </div>
@@ -123,6 +126,13 @@ if (isset($username)) {
 
 			var admin = <?php echo json_encode($_SESSION["admin"]); ?>;
 			var ime_predavaca = <?php echo json_encode($_SESSION["tko"]); ?>;
+
+			if (admin == '1') {
+				document.getElementById("signin").innerHTML = "<input type='button' id='dodaj_korisnika' class='myButton' value='Dodaj korisnika' />";
+				document.getElementById("dodaj_korisnika").onclick = function() {
+					window.location.href = "http://192.168.89.245/~iposavc/projekt/signin.php";
+				}
+			}
 
             globalObject = new JsDatePick({
                 useMode: 1,
@@ -307,8 +317,8 @@ if (isset($username)) {
 						document.getElementById("natrag").onclick = function() {
 							obrada(date, room);
 							document.getElementById("tablica").style.display = "none";
-							document.getElementById("prikaz_kalendara").style.display = "inline-block";
-							document.getElementById("prikaz_predavaonice").style.display = "inline-block";							
+							document.getElementById("prikaz_kalendara").style.display = "block";
+							document.getElementById("prikaz_predavaonice").style.display = "block";							
 							return;
 						}
 
@@ -324,8 +334,8 @@ if (isset($username)) {
 								if (typeof(data) === "string") {
 									alert(data);
 									document.getElementById("tablica").style.display = "none";
-									document.getElementById("prikaz_kalendara").style.display = "inline-block";
-									document.getElementById("prikaz_predavaonice").style.display = "inline-block";
+									document.getElementById("prikaz_kalendara").style.display = "block";
+									document.getElementById("prikaz_predavaonice").style.display = "block";
 									return;
 								}
 								else {

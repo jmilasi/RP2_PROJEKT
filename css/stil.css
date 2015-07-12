@@ -30,21 +30,21 @@ a:hover {
     color: #0B0B61;
 }
 
-.content { 
+.content {
 	border-style: solid;
     border-width: 2px;
     border-radius: 10px;
-	margin: 20px 200px 10px 200px;
-	position: relative;
-	height: auto !important;
-	min-height: 85%;
+	width: 70%;
+	min-height: 100%;
+	margin: 20px auto 10px auto;
 }
 
 .footer {
     border-style: solid;
     border-width: 2px;
     border-radius: 10px;
-	margin: 10px 200px 10px 200px;
+    width: 70%;
+	margin: 10px auto 20px auto;
 	padding: 10px 0 10px 0;
 	text-align: center;
 }
@@ -66,10 +66,15 @@ a:hover {
 	margin: 10px 50px 0 0;
 }
 
+#signin {
+	float: left;
+	margin: 5px 0 0 50px;	
+}
+
 .content h1 {
     font-size: 25px;
 	text-transform: uppercase;
-	margin: 40px 0 60px 0;
+	margin: 50px 0;
 }
 
 #najava_kalendara, #najava_predavaonice {
@@ -78,23 +83,26 @@ a:hover {
 }
 
 #prikaz_kalendara {
-	display: inline-block;
-	margin-left: 50px;
+	margin: 0 auto;
+	margin-top: -20px;
+	margin-bottom: 20px;
+	width: 500px;
+	height: 400px;
+}
+
+#prikaz_predavaonice {
+	margin: 0 auto;
+	margin-top: 30px;
+	width: 400px;
 }
 
 #calendar {
     margin: 20px 0 20px 0;
 }
 
-#prikaz_predavaonice {
-	display: inline-block;
-	float: right;
-	margin-right: 50px;
-}
-
 #predavaonice table {
 	border-width: 2px;
-	margin: 20px 0 20px 0;
+	margin: 20px 0 30px 0;
 	width: 400px;
 }
 
@@ -105,7 +113,7 @@ a:hover {
 
 #tablica {
 	display: none;
-	padding-bottom: 30px;
+	margin-bottom: 10px;
 }
 
 #tablica h2 {
@@ -115,25 +123,26 @@ a:hover {
 }
 
 #natrag {
-	margin: 10px 0 15px 0;
+	margin: 15px 0 30px 0;
 	font-size: 20px;
 }
 
 table {
-    color: black;
-    width: 640px;
     border-collapse: collapse;
     border-spacing: 5;
     border-style: solid;
     border-color: black;
+    color: black;
+    min-width: 50%;
 }
 
 td, th {
     border-style: solid;
     border-color: black;
-    min-width: 50px;
-    padding-right: 10px;
-    padding-left: 10px;
+    min-width: 30px;
+    max-width: 120px;
+    padding-right: 5px;
+    padding-left: 5px;
     transition: all 0.3s; /* simple transition for hover effect */
 }
 
@@ -145,7 +154,7 @@ th {
 }
 
 td {
-    height: 30px;
+    height: 40px;
     background: #FAFAFA;
     text-align: center;
 } 
@@ -168,6 +177,7 @@ tr td:hover { /* hover effect */
 
 input[type="text"].izmjene {
     height: 100%;
+    width: 100%;
     font-size: medium;
     border: none;
     text-align: center;

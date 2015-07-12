@@ -22,9 +22,14 @@ class DB {
 }
 
 function addUserToDatabase() {
+	if (isset($_POST["p_admin"]) && $_POST["p_admin"]=='da')
+		$admin = '1';
+	else
+		$admin = '0';
+	
 	if (!isset($_POST["username"]) || !isset($_POST["password"]))
 		return false;
-
+	
 	$hashed_password = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
 	// Dozvoli samo alfanumerička imena!
@@ -53,7 +58,7 @@ function addUserToDatabase() {
 		"username" => $username,
 		"password" => $hashed_password,
 		"ime" => $ime,
-		"admin" => 0));                                        
+		"admin" => $admin));                                        
 
 	$error = $st->errorInfo();
 	if (isset($error[2])) {	
