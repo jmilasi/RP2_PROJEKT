@@ -32,6 +32,7 @@ if (isset($username) && isset($_POST["logout"])) {
     <link rel="stylesheet" type="text/css" media="all" href="css/jsDatePick_ltr.min.css" />
     <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
     <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
+    <link rel="shortcut icon" href="https://www.math.pmf.unizg.hr/misc/favicon.ico" type="image/vnd.microsoft.icon" />
 </head>
 
 <body>

@@ -17,6 +17,7 @@ else
 	<link rel="stylesheet" type="text/css" href="css/stil.css" />
 	<link rel="stylesheet" type="text/css" href="css/login_form_style.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="css/jsDatePick_ltr.min.css" />
+	<link rel="shortcut icon" href="https://www.math.pmf.unizg.hr/misc/favicon.ico" type="image/vnd.microsoft.icon" />
 	<script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
 	<script type="text/javascript" src="jquery-2.1.4.min.js"></script>
 </head>
